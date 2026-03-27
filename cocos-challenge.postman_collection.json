@@ -1,0 +1,242 @@
+{
+  "info": {
+    "name": "Cocos Challenge Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Portfolio",
+      "item": [
+        {
+          "name": "Get portfolio for user 1",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/portfolio/1"
+          }
+        },
+        {
+          "name": "Get portfolio for user 2 (no orders)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/portfolio/2"
+          }
+        },
+        {
+          "name": "Get portfolio for non-existent user",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/portfolio/999"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search Instruments",
+      "item": [
+        {
+          "name": "Search by ticker",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/instruments/search?q=PAMP",
+              "host": ["{{baseUrl}}"],
+              "path": ["instruments", "search"],
+              "query": [
+                { "key": "q", "value": "PAMP" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search by partial name",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/instruments/search?q=banco",
+              "host": ["{{baseUrl}}"],
+              "path": ["instruments", "search"],
+              "query": [
+                { "key": "q", "value": "banco" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search by partial ticker",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/instruments/search?q=YPF",
+              "host": ["{{baseUrl}}"],
+              "path": ["instruments", "search"],
+              "query": [
+                { "key": "q", "value": "YPF" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Empty search (returns empty array)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/instruments/search?q=",
+              "host": ["{{baseUrl}}"],
+              "path": ["instruments", "search"],
+              "query": [
+                { "key": "q", "value": "" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "MARKET BUY - 5 shares of PAMP",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/orders",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"instrumentId\": 47,\n  \"side\": \"BUY\",\n  \"type\": \"MARKET\",\n  \"quantity\": 5\n}"
+            }
+          }
+        },
+        {
+          "name": "MARKET BUY - by amount (max shares, no fractions)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/orders",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"instrumentId\": 47,\n  \"side\": \"BUY\",\n  \"type\": \"MARKET\",\n  \"amount\": 10000\n}"
+            }
+          }
+        },
+        {
+          "name": "LIMIT BUY - 10 shares at $900 (saved as NEW)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/orders",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"instrumentId\": 47,\n  \"side\": \"BUY\",\n  \"type\": \"LIMIT\",\n  \"quantity\": 10,\n  \"price\": 900\n}"
+            }
+          }
+        },
+        {
+          "name": "MARKET SELL - 5 shares of PAMP",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/orders",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"instrumentId\": 47,\n  \"side\": \"SELL\",\n  \"type\": \"MARKET\",\n  \"quantity\": 5\n}"
+            }
+          }
+        },
+        {
+          "name": "SELL with insufficient shares (REJECTED)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/orders",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"instrumentId\": 47,\n  \"side\": \"SELL\",\n  \"type\": \"MARKET\",\n  \"quantity\": 99999\n}"
+            }
+          }
+        },
+        {
+          "name": "BUY with insufficient funds (REJECTED)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/orders",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"instrumentId\": 47,\n  \"side\": \"BUY\",\n  \"type\": \"MARKET\",\n  \"quantity\": 99999\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cancel Order",
+      "item": [
+        {
+          "name": "Cancel a LIMIT order (status NEW)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/orders/13/cancel"
+          }
+        },
+        {
+          "name": "Cancel a FILLED order (should fail)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/orders/1/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Validation Errors",
+      "item": [
+        {
+          "name": "Missing required fields",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/orders",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "LIMIT without price (should fail)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/orders",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"instrumentId\": 47,\n  \"side\": \"BUY\",\n  \"type\": \"LIMIT\",\n  \"quantity\": 10\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
